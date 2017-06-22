@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/ColorBrushs.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+
+  <Style TargetType="{x:Type Separator}">
+    <Setter Property="Background" Value="{StaticResource LineBrush}"/>
+  </Style>
+  
+  <Style x:Key="{x:Static ToolBar.SeparatorStyleKey}" TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
+    <Setter Property="Background" Value="{StaticResource SilverBrush}"/>
+  </Style>
+</ResourceDictionary>

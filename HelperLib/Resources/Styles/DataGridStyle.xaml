@@ -1,0 +1,147 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/ColorBrushs.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/LinearGradientBrushs.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+
+  <Style TargetType="{x:Type DataGrid}">
+    <Setter Property="Margin" Value="4"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="CanUserAddRows" Value="False"/>
+    <Setter Property="CanUserDeleteRows" Value="False"/>
+    <Setter Property="CanUserResizeRows" Value="False"/>
+    <Setter Property="CanUserResizeColumns" Value="True"/>
+    <Setter Property="CanUserReorderColumns" Value="False"/>
+    <Setter Property="CanUserSortColumns" Value="False"/>
+    <Setter Property="AutoGenerateColumns" Value="False"/>
+    <Setter Property="UseLayoutRounding" Value="True"/>
+    <Setter Property="AlternatingRowBackground" Value="{StaticResource LightGrayBrush}"/>
+    <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource SilverBrush}"/>
+    <Setter Property="VerticalGridLinesBrush" Value="{StaticResource SilverBrush}"/>
+    <Setter Property="IsSynchronizedWithCurrentItem" Value="{x:Null}"/>
+    <Setter Property="ClipboardCopyMode" Value="None"/>
+    <Setter Property="Background" Value="{StaticResource DefaultBackground}"/>
+    <Setter Property="MinHeight" Value="180"/>
+    <Setter Property="HeadersVisibility" Value="Column"/>
+  </Style>
+  <Style x:Key="DefaultBackgroundDataGridStyle" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
+    <Setter Property="Background" Value="{StaticResource DefaultBackground}"/>
+  </Style>
+
+  <Style TargetType="{x:Type DataGridRowHeader}">
+    <Setter Property="Foreground" Value="{StaticResource HeaderForegroundBrush}"/>
+    <Setter Property="Background" Value="{StaticResource HeaderBackgroundBrush}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </Style>
+  <Style  x:Key="DataGridColumnHeaderBase" TargetType="{x:Type DataGridColumnHeader}">
+    <Setter Property="Foreground" Value="{StaticResource HeaderForegroundBrush}"/>
+    <Setter Property="Background" Value="{StaticResource HeaderBackgroundBrush}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Padding" Value="5,2"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style   TargetType="{x:Type DataGridColumnHeader}"  BasedOn="{StaticResource DataGridColumnHeaderBase}">
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style TargetType="{x:Type DataGridRow}">
+    <Style.Triggers>
+      <Trigger Property="IsEditing" Value="True">
+        <Setter Property="BorderBrush" Value="{StaticResource SilverBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="{x:Type DataGridCell}">
+    <Style.Triggers>
+      <Trigger Property="IsEditing" Value="True">
+        <Setter Property="FontWeight" Value="Bold" />
+      </Trigger>
+      <Trigger Property="DataGridCell.IsSelected" Value="True">
+        <Setter Property="Background" Value="DodgerBlue"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style x:Key="DataGridComboBoxColumn_ElementStyle" TargetType="{x:Type ComboBox}">
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style x:Key="DataGridComboBoxColumn_EditingElementStyle" TargetType="{x:Type ComboBox}">
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style x:Key="DataGridTextColumn_ElementStyle" TargetType="{x:Type TextBlock}">
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="Normal"/>
+    <Setter Property="Margin" Value="4,2"/>
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+    <Setter Property="TextTrimming" Value="WordEllipsis"/>
+  </Style>
+  <Style x:Key="DataGridTextColumn_EditingElementStyle" TargetType="{x:Type TextBox}">
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="Normal"/>
+    <Setter Property="Margin" Value="2"/>
+    <Setter Property="AcceptsReturn" Value="False"/>
+  </Style>
+
+
+  <Style x:Key="ColumnHeaderGripperStyle" TargetType="{x:Type Thumb}">
+    <Setter Property="Width" Value="8"/>
+    <Setter Property="Background" Value="{StaticResource TransparentBrush}"/>
+    <Setter Property="Cursor" Value="SizeWE"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type Thumb}">
+          <Border Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style x:Key="SelectColumnButtonStyle" TargetType="{x:Type Button}">
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="Height" Value="10" />
+    <Setter Property="ClickMode" Value="Press" />
+    <Setter Property="Cursor" Value="ScrollS" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type Button}">
+          <Border Background="Transparent" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="{x:Type Menu}" x:Key="authorityMenu">
+    <Style.Triggers>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="OpacityMask" Value="{StaticResource disabledMask}" />
+        <Setter Property="Opacity" Value="0.8"/>
+      </Trigger>
+      <Trigger Property="IsEnabled" Value="True">
+        <Setter Property="OpacityMask" Value="{StaticResource enabledMask}" />
+        <Setter Property="Opacity" Value="1.0"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+</ResourceDictionary>
