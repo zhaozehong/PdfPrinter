@@ -1,19 +1,17 @@
-﻿using iTextSharp.text;
-using iTextSharp.text.pdf;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.IO;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Zehong.CSharp.Solution.HelperLib;
 
-namespace Zehong.CSharp.Solution.PdfPrinter
+namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
 {
   public static class PdfPrinter
   {
@@ -355,16 +353,10 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         if (streamGeometry != null)
         {
           var figures = GeometryDataParser.GetDataFigures(streamGeometry.ToString());
-          Point? lastEndPoint = new Point();
-          Point? shapeStartPoint = new Point();
           foreach (var figure in figures)
           {
-            if (lastEndPoint == null || shapeStartPoint == null)
+            if (!figure.Draw(left, top, dc, shape.LayoutTransform))
               break;
-
-            lastEndPoint = figure.Draw(left, top, dc, shape.LayoutTransform, shapeStartPoint.Value, lastEndPoint.Value);
-            if (figure is MoveTo)
-              shapeStartPoint = lastEndPoint;
           }
         }
         var pathGrometry = shape.RenderedGeometry as PathGeometry;
@@ -964,5 +956,117 @@ namespace Zehong.CSharp.Solution.PdfPrinter
 
     private static iTextSharp.text.Color TransparentBaseColor = new iTextSharp.text.Color(0, 0, 0, 0);
     private static Point OrginalPoint = new Point(0, 0);
+  }
+  public class GradientBackgroundEvent : IPdfPCellEvent
+  {
+    public GradientBackgroundEvent(PdfWriter writer, Brush backgroundBrush)
+    {
+      this._writer = writer;
+      this._backgroundBrush = backgroundBrush;
+    }
+    public void CellLayout(PdfPCell cell, iTextSharp.text.Rectangle position, PdfContentByte[] canvases)
+    {
+      if (Helper.IsTransparent(_backgroundBrush))
+        position.BackgroundColor = null;
+
+      var gradientBrush = _backgroundBrush as GradientBrush;
+      if (gradientBrush != null)
+      {
+        PdfShading shading = null;
+
+        var fromColor = PdfPrinter.GetBaseColor(gradientBrush.GradientStops.FirstOrDefault().Color);
+        var toColor = PdfPrinter.GetBaseColor(gradientBrush.GradientStops.LastOrDefault().Color);
+
+        var linearGradientBrush = _backgroundBrush as LinearGradientBrush;
+        if (linearGradientBrush != null)
+        {
+          float x0, y0, x1, y1;
+          var brushSlopeAbs = Math.Abs(linearGradientBrush.EndPoint.Y - linearGradientBrush.StartPoint.Y) / Math.Abs(linearGradientBrush.EndPoint.X - linearGradientBrush.StartPoint.X);
+          var cellSlopeAbs = position.Height / position.Width;
+          if (linearGradientBrush.EndPoint.X > linearGradientBrush.StartPoint.X) // from left to right
+          {
+            x0 = position.Left;
+            if (linearGradientBrush.EndPoint.Y > linearGradientBrush.StartPoint.Y) // from top to bottom
+            {
+              y0 = position.Top;
+              if (cellSlopeAbs >= brushSlopeAbs)
+              {
+                x1 = position.Left + (float)(position.Height / brushSlopeAbs);
+                y1 = position.Bottom;
+              }
+              else
+              {
+                x1 = position.Right;
+                y1 = position.Top - (float)(position.Width * brushSlopeAbs);
+              }
+            }
+            else // from bottom to top
+            {
+              y0 = position.Bottom;
+              if (cellSlopeAbs >= brushSlopeAbs)
+              {
+                x1 = position.Left + (float)(position.Height / brushSlopeAbs);
+                y1 = position.Top;
+              }
+              else
+              {
+                x1 = position.Right;
+                y1 = position.Bottom + (float)(position.Width * brushSlopeAbs);
+              }
+            }
+          }
+          else // from right to left
+          {
+            x0 = position.Right;
+            if (linearGradientBrush.EndPoint.Y > linearGradientBrush.StartPoint.Y) // from top to bottom
+            {
+              y0 = position.Top;
+              if (cellSlopeAbs >= brushSlopeAbs)
+              {
+                x1 = position.Right - (float)(position.Height / brushSlopeAbs);
+                y1 = position.Bottom;
+              }
+              else
+              {
+                x1 = position.Right;
+                y1 = position.Top - (float)(position.Width * brushSlopeAbs);
+              }
+            }
+            else // from bottom to top
+            {
+              y0 = position.Bottom;
+              if (cellSlopeAbs >= brushSlopeAbs)
+              {
+                x1 = position.Right - (float)(position.Height / brushSlopeAbs);
+                y1 = position.Top;
+              }
+              else
+              {
+                x1 = position.Right;
+                y1 = position.Bottom + (float)(position.Width * brushSlopeAbs);
+              }
+            }
+          }
+
+          shading = PdfShading.SimpleAxial(_writer, x0, y0, x1, y1, fromColor, toColor, false, false);
+        }
+
+        var radialGradientBrush = _backgroundBrush as RadialGradientBrush;
+        if (radialGradientBrush != null)
+        {
+          float xCenter = 0, yCenter = 0, radius = 0;
+          shading = PdfShading.SimpleRadial(_writer, xCenter, yCenter, 0, xCenter, yCenter, radius, fromColor, toColor, true, true);
+        }
+
+        if (shading != null)
+          position.BackgroundColor = new ShadingColor(new PdfShadingPattern(shading));
+      }
+
+      //Fill the rectangle
+      canvases[PdfPTable.BACKGROUNDCANVAS].Rectangle(position);
+    }
+
+    private PdfWriter _writer;
+    private Brush _backgroundBrush;
   }
 }

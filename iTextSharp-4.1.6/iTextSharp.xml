@@ -14214,7 +14214,7 @@
              @param f an element of the transformation matrix
             
         </member>
-        <!-- Badly formed XML comment ignored for member "M:iTextSharp.text.pdf.PdfContentByte.BezierArc(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)" -->
+        <!-- Badly formed XML comment ignored for member "M:iTextSharp.text.pdf.PdfContentByte.BezierArc(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)" -->
         <member name="M:iTextSharp.text.pdf.PdfContentByte.Arc(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
              Draws a partial ellipse inscribed within the rectangle x1,y1,x2,y2,
              starting at startAng degrees and covering extent degrees. Angles

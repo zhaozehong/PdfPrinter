@@ -1940,6 +1940,10 @@ namespace iTextSharp.text.pdf
      * @param extent angle extent in degrees
      * @return a list of float[] with the bezier curves
      */
+    public static ArrayList BezierArc(Double x1, Double y1, Double x2, Double y2, Double startAng, Double extent)
+    {
+      return BezierArc((float)x1, (float)y1, (float)x2, (float)y2, (float)startAng, (float)extent);
+    }
     public static ArrayList BezierArc(float x1, float y1, float x2, float y2, float startAng, float extent)
     {
       float tmp;
