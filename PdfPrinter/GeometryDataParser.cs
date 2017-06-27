@@ -88,7 +88,7 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
       if (String.IsNullOrWhiteSpace(strCommand) || !strCommand.StartsWith("M", StringComparison.InvariantCultureIgnoreCase))
         return null;
 
-      var datas = DPApplication.GetSplitStrings(strCommand.Substring(1), true, ',');
+      var datas = Helper.GetSplitStrings(strCommand.Substring(1), true, ',');
       if (datas.Count != 2)
         return null;
 
@@ -139,14 +139,14 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
       if (String.IsNullOrWhiteSpace(strCommand) || !strCommand.StartsWith("L", StringComparison.InvariantCultureIgnoreCase))
         return null;
 
-      var pointStrings = DPApplication.GetSplitStrings(strCommand.Substring(1), true, ' ');
+      var pointStrings = Helper.GetSplitStrings(strCommand.Substring(1), true, ' ');
       if (!pointStrings.Any())
         return null;
 
       var points = new List<Point>();
       foreach (var pointString in pointStrings)
       {
-        var datas = DPApplication.GetSplitStrings(pointString, true, ',');
+        var datas = Helper.GetSplitStrings(pointString, true, ',');
         if (datas.Count != 2)
           return null;
 
@@ -202,7 +202,7 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
       if (String.IsNullOrWhiteSpace(strCommand) || !strCommand.StartsWith("A", StringComparison.InvariantCultureIgnoreCase))
         return null;
 
-      var datas = DPApplication.GetSplitStrings(strCommand.Substring(1), true, ',');
+      var datas = Helper.GetSplitStrings(strCommand.Substring(1), true, ',');
       if (datas.Count != 7)
         return null;
 
@@ -255,9 +255,9 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
         var y0 = (-B + Math.Sqrt(B * B - 4 * A * C)) / (2 * A);
         var x0 = x2;
         var temp = 1 - (y2 - y0) * (y2 - y0) / (b * b);
-        if (DPApplication.IsNullOrZero(temp))
+        if (Helper.IsNullOrZero(temp))
         {
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
@@ -266,14 +266,14 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
         else if (temp > 0)
         {
           x0 = x2 + a * Math.Sqrt(temp);
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
           }
 
           x0 = x2 - a * Math.Sqrt(temp);
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
@@ -283,9 +283,9 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
         y0 = (-B - Math.Sqrt(B * B - 4 * A * C)) / (2 * A);
         x0 = x2;
         temp = 1 - (y2 - y0) * (y2 - y0) / (b * b);
-        if (DPApplication.IsNullOrZero(temp))
+        if (Helper.IsNullOrZero(temp))
         {
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
@@ -294,14 +294,14 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
         else if (temp > 0)
         {
           x0 = x2 + a * Math.Sqrt(temp);
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
           }
 
           x0 = x2 - a * Math.Sqrt(temp);
-          if (DPApplication.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
+          if (Helper.IsNullOrZero((x1 - x0) * (x1 - x0) / a / a + (y1 - y0) * (y1 - y0) / b / b - 1))
           {
             transformedPoint = transform.Transform(new Point(x0, y0));
             centers.Add(new Point(left + transformedPoint.X, top - transformedPoint.Y));
