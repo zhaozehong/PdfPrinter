@@ -1,0 +1,71 @@
+﻿<Window x:Class="Zehong.CSharp.Solution.HelperLib.MessageBoxEx"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:HelperLib="clr-namespace:Zehong.CSharp.Solution.HelperLib"
+        Icon="/HelperLib;component/Resources/Images/PCDMIS_WebReporter.ico"
+        x:Name="self" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" SizeToContent="WidthAndHeight" ResizeMode="NoResize" MaxWidth="700">
+  <Window.Resources>
+    <ResourceDictionary >
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/Styles.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+      <HelperLib:BooleanToVisibilityConverterReverse x:Key="BoolToVisibilityReverse"/>
+      <HelperLib:BooleanReverseConverter x:Key="BooleanReverse"/>
+    </ResourceDictionary>
+  </Window.Resources>
+
+  <Border Style="{StaticResource WindowOutBorderStyle}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <!--Client-->
+      <Grid Grid.Row="0" Margin="8" >
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="4"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Row="0" Grid.Column="0" Source="/HelperLib;component/Resources/Images/Warning.png" Height="28"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" MinWidth="200" TextWrapping="WrapWithOverflow"
+                   Text="{Binding ElementName=self, Path=Prompt}"/>
+
+        <Expander Grid.Row="2" Grid.Column="1" x:Name="expanderDetails" MaxHeight="300"
+                  Visibility="{Binding ElementName=self, Path=HasDetails, Converter={StaticResource BoolToVisibility}}">
+          <Expander.Header>
+            <StackPanel>
+              <TextBlock Text="Show more..."
+                         Visibility="{Binding ElementName=expanderDetails, Path=IsExpanded, Converter={StaticResource BoolToVisibilityReverse}}"/>
+              <TextBlock Text="Hide more..."
+                         Visibility="{Binding ElementName=expanderDetails, Path=IsExpanded, Converter={StaticResource BoolToVisibility}}"/>
+            </StackPanel>
+          </Expander.Header>
+          <RichTextBox Grid.Row="2" IsReadOnly="True" VerticalScrollBarVisibility="Auto">
+            <RichTextBox.Document>
+              <FlowDocument>
+                <Paragraph>
+                  <Run x:Name="runDetails"/>
+                </Paragraph>
+              </FlowDocument>
+            </RichTextBox.Document>
+          </RichTextBox>
+        </Expander>
+      </Grid>
+
+      <!--Buttons-->
+      <Border Grid.Row="1">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Style="{StaticResource DialogCloseButtonStyle}" Click="btnOk_Click" IsDefault="True" Content="OK"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

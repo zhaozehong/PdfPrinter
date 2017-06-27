@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:HelperLib="clr-namespace:Net.HexagonMetrology.WAI.Datapage.HelperLib">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/ColorBrushs.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/LinearGradientBrushs.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/BorderStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ButtonStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/CheckBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ComboBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/DataGridStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ExpanderStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/GridSplitterStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/GroupBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ImageStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ListBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ListViewStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/MenuStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/PasswordBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ProgressBarStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/RichTextBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ScrollViewer.xaml"/> 
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/SeparatorStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/TabStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/TextBlockStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/TextBoxStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/ToolBarStyle.xaml"/>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Styles/TreeViewStyle.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

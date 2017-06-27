@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/ColorBrushs.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+  
+  <ControlTemplate x:Key="elliRTB" TargetType="{x:Type TextBoxBase}" >
+    <Grid>
+      <Ellipse x:Name="elli" Fill="{TemplateBinding Background}"  StrokeThickness="1" Stroke="{StaticResource LineBrush}"/>
+      <ScrollViewer Margin="0" x:Name="PART_ContentHost"/>
+    </Grid>
+  </ControlTemplate>
+</ResourceDictionary>
