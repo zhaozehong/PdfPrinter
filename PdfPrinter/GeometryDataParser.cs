@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using Net.HexagonMetrology.WAI.Datapage.HelperLib;
 using iTextSharp.text.pdf;
 using System.Windows.Media;
 using System.Diagnostics;
 using Zehong.CSharp.Solution.HelperLib;
 
-namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
+namespace Zehong.CSharp.Solution.PdfPrinter
 {
   public static class GeometryDataParser
   {

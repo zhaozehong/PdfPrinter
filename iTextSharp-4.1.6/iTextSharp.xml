@@ -1284,6 +1284,14 @@
             <param name="text">the text for the tag</param>
             <returns>this Chunk</returns>
         </member>
+        <member name="F:iTextSharp.text.Chunk.LINEHEIGHT">
+            Key for line-height (alternative for leading in Phrase). 
+        </member>
+        <member name="M:iTextSharp.text.Chunk.setLineHeight(System.Single)">
+             Sets a line height tag.
+            
+             @return this <CODE>Chunk</CODE>
+        </member>
         <member name="F:iTextSharp.text.Chunk.IMAGE">
             <summary> Key for image. </summary>
         </member>
@@ -13501,6 +13509,9 @@
         </member>
         <member name="F:iTextSharp.text.pdf.PdfChunk.changeLeading">
             Indicates if the height and offset of the Image has to be taken into account 
+        </member>
+        <member name="F:iTextSharp.text.pdf.PdfChunk.leading">
+            The leading that can overrule the existing leading. 
         </member>
         <member name="M:iTextSharp.text.pdf.PdfChunk.#ctor(System.String,iTextSharp.text.pdf.PdfChunk)">
              Constructs a <CODE>PdfChunk</CODE>-object.

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Zehong.CSharp.Solution.PdfPrinter;
 
 namespace PrinterTest
 {
@@ -23,6 +24,14 @@ namespace PrinterTest
     public MainWindow()
     {
       InitializeComponent();
+    }
+
+    private void btnPrint_Click(object sender, RoutedEventArgs e)
+    {
+      var path = String.Format("{0}\\{1}.pdf",
+        Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+        DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss"));
+      PdfPrinter.Print(new List<Canvas> { canvasObj }, path);
     }
   }
 }

@@ -1,6 +1,6 @@
-﻿<ResourceDictionary x:Class="Net.HexagonMetrology.WAI.Datapage.HelperLib.brushstyle"
+﻿<ResourceDictionary x:Class="Zehong.CSharp.Solution.HelperLib.brushstyle"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:HelperLib="clr-namespace:Net.HexagonMetrology.WAI.Datapage.HelperLib"
+    xmlns:HelperLib="clr-namespace:Zehong.CSharp.Solution.HelperLib"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="/HelperLib;Component/Resources/Brush/ColorBrushs.xaml"/>

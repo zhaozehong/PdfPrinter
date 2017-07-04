@@ -94,7 +94,7 @@
     </GradientBrush.GradientStops>
   </LinearGradientBrush>
 
-  <LinearGradientBrush x:Key="DataPageTitleBar" EndPoint="0.115,0.063" StartPoint="0.115,1.203">
+  <LinearGradientBrush x:Key="TitleBarBrush" EndPoint="0.115,0.063" StartPoint="0.115,1.203">
     <GradientStop Color="#FF4E8FD0" Offset="1"/>
     <GradientStop Color="#FFFFFFFF" Offset="0"/>
   </LinearGradientBrush>

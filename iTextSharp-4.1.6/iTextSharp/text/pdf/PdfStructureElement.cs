@@ -49,88 +49,99 @@ using System;
  * http://www.lowagie.com/iText/
  */
 
-namespace iTextSharp.text.pdf {
+namespace iTextSharp.text.pdf
+{
+  /**
+  * This is a node in a document logical structure. It may contain a mark point or it may contain
+  * other nodes.
+  * @author Paulo Soares (psoares@consiste.pt)
+  */
+  public class PdfStructureElement : PdfDictionary
+  {
+
     /**
-    * This is a node in a document logical structure. It may contain a mark point or it may contain
-    * other nodes.
-    * @author Paulo Soares (psoares@consiste.pt)
+    * Holds value of property kids.
     */
-    public class PdfStructureElement : PdfDictionary {
-        
-        /**
-        * Holds value of property kids.
-        */
-        private PdfStructureElement parent;
-        private PdfStructureTreeRoot top;
-        
-        /**
-        * Holds value of property reference.
-        */
-        private PdfIndirectReference reference;
-        
-        /**
-        * Creates a new instance of PdfStructureElement.
-        * @param parent the parent of this node
-        * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
-        */
-        public PdfStructureElement(PdfStructureElement parent, PdfName structureType) {
-            top = parent.top;
-            Init(parent, structureType);
-            this.parent = parent;
-            Put(PdfName.P, parent.reference);
-        }
-        
-        /**
-        * Creates a new instance of PdfStructureElement.
-        * @param parent the parent of this node
-        * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
-        */    
-        public PdfStructureElement(PdfStructureTreeRoot parent, PdfName structureType) {
-            top = parent;
-            Init(parent, structureType);
-            Put(PdfName.P, parent.Reference);
-        }
-        
-        private void Init(PdfDictionary parent, PdfName structureType) {
-            PdfObject kido = parent.Get(PdfName.K);
-            PdfArray kids = null;
-            if (kido != null && !kido.IsArray())
-                throw new ArgumentException("The parent has already another function.");
-            if (kido == null) {
-                kids = new PdfArray();
-                parent.Put(PdfName.K, kids);
-            }
-            else
-                kids = (PdfArray)kido;
-            kids.Add(this);
-            Put(PdfName.S, structureType);
-            reference = top.Writer.PdfIndirectReference;
-        }
-        
-        /**
-        * Gets the parent of this node.
-        * @return the parent of this node
-        */    
-        public PdfDictionary Parent {
-            get {
-                return parent;
-            }
-        }
-        
-        internal void SetPageMark(int page, int mark) {
-            if (mark >= 0)
-                Put(PdfName.K, new PdfNumber(mark));
-            top.SetPageMark(page, reference);
-        }
-        
-        /**
-        * Gets the reference this object will be written to.
-        * @return the reference this object will be written to
-        */    
-        public PdfIndirectReference Reference {
-            get {
-                return this.reference;
-            }
-        }
+    private PdfStructureElement parent;
+    private PdfStructureTreeRoot top;
+
+    /**
+    * Holds value of property reference.
+    */
+    private PdfIndirectReference reference;
+
+    /**
+    * Creates a new instance of PdfStructureElement.
+    * @param parent the parent of this node
+    * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
+    */
+    public PdfStructureElement(PdfStructureElement parent, PdfName structureType)
+    {
+      top = parent.top;
+      Init(parent, structureType);
+      this.parent = parent;
+      Put(PdfName.P, parent.reference);
     }
+
+    /**
+    * Creates a new instance of PdfStructureElement.
+    * @param parent the parent of this node
+    * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
+    */
+    public PdfStructureElement(PdfStructureTreeRoot parent, PdfName structureType)
+    {
+      top = parent;
+      Init(parent, structureType);
+      Put(PdfName.P, parent.Reference);
+    }
+
+    private void Init(PdfDictionary parent, PdfName structureType)
+    {
+      PdfObject kido = parent.Get(PdfName.K);
+      PdfArray kids = null;
+      if (kido != null && !kido.IsArray())
+        throw new ArgumentException("The parent has already another function.");
+      if (kido == null)
+      {
+        kids = new PdfArray();
+        parent.Put(PdfName.K, kids);
+      }
+      else
+        kids = (PdfArray)kido;
+      kids.Add(this);
+      Put(PdfName.S, structureType);
+      reference = top.Writer.PdfIndirectReference;
+    }
+
+    /**
+    * Gets the parent of this node.
+    * @return the parent of this node
+    */
+    public PdfDictionary Parent
+    {
+      get
+      {
+        return parent;
+      }
+    }
+
+    internal void SetPageMark(int page, int mark)
+    {
+      if (mark >= 0)
+        Put(PdfName.K, new PdfNumber(mark));
+      top.SetPageMark(page, reference);
+    }
+
+    /**
+    * Gets the reference this object will be written to.
+    * @return the reference this object will be written to
+    */
+    public PdfIndirectReference Reference
+    {
+      get
+      {
+        return this.reference;
+      }
+    }
+  }
 }

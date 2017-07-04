@@ -452,11 +452,10 @@ namespace Zehong.CSharp.Solution.HelperLib
           {
             _transparentSolidBrush = (SolidColorBrush)Application.Current.Resources["TransparentBrush"];
           }
-          catch
-          {
-            _transparentSolidBrush = Brushes.Transparent;
-          }
+          catch { }
         }
+        if(_transparentSolidBrush == null)
+          _transparentSolidBrush = Brushes.Transparent;
         return _transparentSolidBrush;
       }
     }

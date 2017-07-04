@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Zehong.CSharp.Solution.HelperLib;
 
-namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
+namespace Zehong.CSharp.Solution.PdfPrinter
 {
   public static class PdfPrinter
   {
@@ -40,7 +40,7 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
           document.Open();
           foreach (var page in pages)
           {
-            document.SetPageSize(new iTextSharp.text.Rectangle(0, 0, (float)page.Width, (float)page.Height));
+            document.SetPageSize(new iTextSharp.text.Rectangle(0, 0, (float)page.ActualWidth, (float)page.ActualHeight));
             document.NewPage();
 
             PrintPage(page, writer);
@@ -588,12 +588,12 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
       pdfTable.HorizontalAlignment = GetPdfElementAlignment(horizontalAlignment);
       return pdfTable;
     }
-    private static Phrase GetPdfPhrase(String text, Double fontSize, FontFamily fontFamily, FontWeight fontWeight, Brush foreground, Double maxTextWidth)
+    private static Phrase GetPdfPhrase(String text, Double fontSize, FontFamily fontFamily, FontWeight fontWeight, Brush foreground, Double maxTextWidth, Double renderHeight, Double lineHeight = Double.NaN)
     {
       try
       {
         var font = GetPdfFont(text, fontSize, fontFamily, fontWeight, foreground);
-        if (font.Familyname != fontFamily.ToString())
+        if (!String.IsNullOrWhiteSpace(text))
         {
           while (MeasureTextWidth(text, fontSize, font.Familyname, fontWeight) >= maxTextWidth)
           {
@@ -601,7 +601,12 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
           }
           font.Size = (float)fontSize;
         }
-        return new Paragraph(text, font);
+
+        var lines = Helper.GetSplitStrings(text, false, '\n');
+        var chunk = new Chunk(text, font);
+        if (!Double.IsNaN(lineHeight) || lines.Count > 1)
+          chunk.setLineHeight((float)(renderHeight / lines.Count));
+        return new Paragraph(chunk);
       }
       catch (Exception ex)
       {
@@ -624,7 +629,9 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
           textBlock.FontFamily,
           textBlock.FontWeight,
           textBlock.Foreground,
-          textBlock.ActualWidth - textBlock.Padding.Left - textBlock.Padding.Right);
+          textBlock.ActualWidth - textBlock.Padding.Left - textBlock.Padding.Right,
+          textBlock.ActualHeight,
+          textBlock.LineHeight);
         if (pdfPhrase != null)
           WritePdfElement(writer.DirectContent, ref pdfPhrase, textBlock, left, top);
       }
@@ -647,7 +654,8 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
           textBox.FontFamily,
           textBox.FontWeight,
           textBox.Foreground,
-          textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right - 4);
+          textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right - 4,
+          textBox.ActualHeight);
         if (pdfPhrase != null)
           WritePdfElement(writer.DirectContent, ref pdfPhrase, textBox, left, top);
       }
@@ -922,7 +930,7 @@ namespace Net.HexagonMetrology.WAI.Datapage.ReportControls
       {
         var location = uiElement.TranslatePoint(OrginalPoint, currentPage);
         left = (float)location.X;
-        top = (float)(currentPage.Height - location.Y);
+        top = (float)(currentPage.ActualHeight - location.Y);
         return true;
       }
       catch (Exception ex)
