@@ -31,6 +31,7 @@ namespace PrinterTest
       var path = String.Format("{0}\\{1}.pdf",
         Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
         DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss"));
+
       PdfPrinter.Print(new List<Canvas> { canvasObj }, path);
     }
   }

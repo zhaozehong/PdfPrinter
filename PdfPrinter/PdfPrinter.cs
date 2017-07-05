@@ -595,7 +595,7 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         var font = GetPdfFont(text, fontSize, fontFamily, fontWeight, foreground);
         if (!String.IsNullOrWhiteSpace(text))
         {
-          while (MeasureTextWidth(text, fontSize, font.Familyname, fontWeight) >= maxTextWidth)
+          while (font.BaseFont.GetWidthPoint(text, (float)fontSize) >= maxTextWidth)
           {
             fontSize -= 0.1;
           }
