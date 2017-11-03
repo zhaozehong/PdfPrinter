@@ -15,18 +15,18 @@ namespace Zehong.CSharp.Solution.PdfPrinter
 {
   public static class PdfPrinter
   {
-    public static void Print(List<Canvas> pages, String fileName, String passward = null)
+    public static Boolean Print(List<Canvas> pages, String fileName, String passward = null)
     {
       if (pages == null || String.IsNullOrWhiteSpace(fileName))
-        return;
+        return false;
 
       pages = pages.Where(p => p != null).ToList();
       if (!pages.Any())
-        return;
+        return false;
 
       fileName = System.IO.Path.ChangeExtension(fileName, ".pdf");
       if (String.IsNullOrWhiteSpace(Helper.ForceCreateDirectoryEx(fileName)))
-        return;
+        return false;
 
       try
       {
@@ -40,10 +40,10 @@ namespace Zehong.CSharp.Solution.PdfPrinter
           document.Open();
           foreach (var page in pages)
           {
-            document.SetPageSize(new iTextSharp.text.Rectangle(0, 0, (float)page.ActualWidth, (float)page.ActualHeight));
+            document.SetPageSize(new iTextSharp.text.Rectangle(0, 0, (float)page.Width, (float)page.Height)); // Zehong: Don't use page.ActualWidth & page.ActualHeight, since it always returns 0.0 here.
             document.NewPage();
 
-            PrintPage(page, writer);
+            PrintPage(page, writer.DirectContent);
           }
         }
 
@@ -56,10 +56,14 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         ExceptionHandler.ThrowException(ex);
       }
       if (ExceptionHandler.HasError)
+      {
         File.Delete(fileName);
+        return false;
+      }
+      return true;
     }
 
-    private static void PrintPage(Canvas page, PdfWriter writer)
+    private static void PrintPage(Canvas page, PdfContentByte dc)
     {
       if (page == null || page.Visibility != Visibility.Visible)
         return;
@@ -68,10 +72,10 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       var pageElements = page.Children.OfType<FrameworkElement>().Where(p => p.Visibility == Visibility.Visible).OrderBy(p => p.SafeGetZIndex()).ToList();
       foreach (var pageElement in pageElements)
       {
-        PrintElement(pageElement, page, writer);
+        PrintElement(pageElement, page, dc);
       }
     }
-    private static void PrintElement(FrameworkElement element, Canvas currentPage, PdfWriter writer)
+    private static void PrintElement(FrameworkElement element, FrameworkElement relativeTo, PdfContentByte dc)
     {
       if (element == null || element.Visibility != Visibility.Visible || element.RenderSize.IsEmpty || element.RenderSize.IsZero() || element.RenderSize.IsNaN())
         return;
@@ -79,21 +83,21 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       try
       {
         if (element is ContentPresenter)
-          PrintContentPresenter((ContentPresenter)element, currentPage, writer);
+          PrintContentPresenter((ContentPresenter)element, relativeTo, dc);
         else if (element is Control)
-          PrintControl((Control)element, currentPage, writer);
+          PrintControl((Control)element, relativeTo, dc);
         else if (element is Decorator)
-          PrintDecorator((Decorator)element, currentPage, writer);
+          PrintDecorator((Decorator)element, relativeTo, dc);
         else if (element is System.Windows.Controls.Image)
-          PrintImage((System.Windows.Controls.Image)element, null, currentPage, writer);
+          PrintImage((System.Windows.Controls.Image)element, null, relativeTo, dc);
         else if (element is Panel)
-          PrintPanel((Panel)element, currentPage, writer);
+          PrintPanel((Panel)element, relativeTo, dc);
         else if (element is TextBlock)
-          PrintText((TextBlock)element, currentPage, writer);
+          PrintText((TextBlock)element, relativeTo, dc);
         else if (element is Viewport3D)
-          PrintImage(GetViewport3DImage((Viewport3D)element), element, currentPage, writer);
+          PrintImage(GetFrameworkElementImage(element), element, relativeTo, dc);
         else if (element is Shape)
-          PrintShape((Shape)element, currentPage, writer);
+          PrintShape((Shape)element, relativeTo, dc);
       }
       catch (Exception ex)
       {
@@ -102,7 +106,7 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     }
 
     #region ContentPresenter
-    private static void PrintContentPresenter(ContentPresenter element, Canvas currentPage, PdfWriter writer)
+    private static void PrintContentPresenter(ContentPresenter element, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
@@ -114,7 +118,7 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         if (content == null)
           return;
 
-        PrintElement(content, currentPage, writer);
+        PrintElement(content, relativeTo, dc);
       }
       catch (Exception ex)
       {
@@ -124,27 +128,27 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     #endregion
 
     #region Control
-    private static void PrintControl(Control control, Canvas currentPage, PdfWriter writer)
+    private static void PrintControl(Control control, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
         if (control is ContentControl)
-          PrintContentControl((ContentControl)control, currentPage, writer);
+          PrintContentControl((ContentControl)control, relativeTo, dc);
         else if (control is ItemsControl)
-          PrintItemsControl((ItemsControl)control, currentPage, writer);
+          PrintItemsControl((ItemsControl)control, relativeTo, dc);
         else if (control is TextBox)
-          PrintText((TextBox)control, currentPage, writer);
+          PrintText((TextBox)control, relativeTo, dc);
       }
       catch (Exception ex)
       {
         ExceptionHandler.ThrowException(ex);
       }
     }
-    private static void PrintContentControl(ContentControl contentControl, Canvas currentPage, PdfWriter writer)
+    private static void PrintContentControl(ContentControl contentControl, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
-        PrintBackground(contentControl, currentPage, writer);
+        PrintBackground(contentControl, relativeTo, dc);
         var uiElement = contentControl.Content as FrameworkElement;
         if (uiElement == null)
         {
@@ -154,21 +158,21 @@ namespace Zehong.CSharp.Solution.PdfPrinter
             Padding = new Thickness(0)
           };
         }
-        PrintElement(uiElement, currentPage, writer);
+        PrintElement(uiElement, relativeTo, dc);
       }
       catch (Exception ex)
       {
         ExceptionHandler.ThrowException(ex);
       }
     }
-    private static void PrintItemsControl(ItemsControl element, Canvas currentPage, PdfWriter writer)
+    private static void PrintItemsControl(ItemsControl element, FrameworkElement relativeTo, PdfContentByte dc)
     {
       if (element.ItemContainerGenerator == null)
         return;
 
       try
       {
-        PrintBackground(element, currentPage, writer);
+        PrintBackground(element, relativeTo, dc);
         for (int i = 0; i < element.Items.Count; i++)
         {
           var itemUI = element.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
@@ -183,7 +187,7 @@ namespace Zehong.CSharp.Solution.PdfPrinter
           if (content == null)
             continue;
 
-          PrintElement(content, currentPage, writer);
+          PrintElement(content, relativeTo, dc);
         }
       }
       catch (Exception ex)
@@ -194,37 +198,53 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     #endregion
 
     #region Decorator
-    private static void PrintDecorator(Decorator decorator, Canvas currentPage, PdfWriter writer)
+    private static void PrintDecorator(Decorator decorator, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
         if (decorator is Border)
-          PrintBorder((Border)decorator, currentPage, writer);
+          PrintBorder((Border)decorator, relativeTo, dc);
         else if (decorator is Viewbox)
-          PrintViewbox((Viewbox)decorator, currentPage, writer);
+          PrintViewbox((Viewbox)decorator, relativeTo, dc);
       }
       catch (Exception ex)
       {
         ExceptionHandler.ThrowException(ex);
       }
     }
-    private static void PrintBorder(Border border, Canvas currentPage, PdfWriter writer)
+    private static void PrintBorder(Border border, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
-        PrintBackground(border, currentPage, writer);
-        PrintElement(border.Child as FrameworkElement, currentPage, writer);
+        PrintBackground(border, relativeTo, dc);
+        PrintElement(border.Child as FrameworkElement, relativeTo, dc);
       }
       catch (Exception ex)
       {
         ExceptionHandler.ThrowException(ex);
       }
     }
-    private static void PrintViewbox(Viewbox viewbox, Canvas currentPage, PdfWriter writer)
+    private static void PrintViewbox(Viewbox viewbox, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
-        PrintElement(viewbox.Child as FrameworkElement, currentPage, writer);
+        PrintImage(GetFrameworkElementImage(viewbox), viewbox, relativeTo, dc);
+
+        //float left, top;
+        //if (!GetElementLocation(viewbox, relativeTo, out left, out top))
+        //  return;
+
+        //var template = dc.CreateTemplate((float)viewbox.ActualWidth, (float)viewbox.ActualHeight);
+
+        //PrintElement(viewbox.Child as FrameworkElement, viewbox, dc);
+
+        //dc.AddTemplate(template,
+        //  (float)viewbox.RenderTransform.Value.M11,
+        //  (float)viewbox.RenderTransform.Value.M12,
+        //  (float)viewbox.RenderTransform.Value.M21,
+        //  (float)viewbox.RenderTransform.Value.M22,
+        //  (float)viewbox.RenderTransform.Value.OffsetX + left,
+        //  (float)viewbox.RenderTransform.Value.OffsetY + top);
       }
       catch (Exception ex)
       {
@@ -235,20 +255,20 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     #endregion
 
     #region Image
-    private static void PrintImage(System.Windows.Controls.Image image, FrameworkElement imageSource, Canvas currentPage, PdfWriter writer)
+    private static void PrintImage(System.Windows.Controls.Image image, FrameworkElement imageSource, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
         var control = imageSource ?? (FrameworkElement)image;
 
         float left, top;
-        if (!GetElementLocation(control, currentPage, out left, out top))
+        if (!GetElementLocation(control, relativeTo, out left, out top))
           return;
 
         IElement pdfImage = iTextSharp.text.Image.GetInstance(ImageToDrawingImage(image), System.Drawing.Imaging.ImageFormat.Png);
         //IElement pdfImage = iTextSharp.text.Image.GetInstance(@"C:\Users\zehong.zhao\Pictures\IMG_0091 (002).jpg");
 
-        WritePdfElement(writer.DirectContent, ref pdfImage, control, left, top);
+        WritePdfElement(dc, ref pdfImage, control, left, top);
       }
       catch (Exception ex)
       {
@@ -258,15 +278,15 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     #endregion
 
     #region Panel
-    private static void PrintPanel(Panel panel, Canvas currentPage, PdfWriter writer)
+    private static void PrintPanel(Panel panel, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
-        PrintBackground(panel, currentPage, writer);
+        PrintBackground(panel, relativeTo, dc);
         var children = panel.Children.OfType<FrameworkElement>().Where(p => p.Visibility == Visibility.Visible).OrderBy(p => p.SafeGetZIndex()).ToList();
         foreach (var child in children)
         {
-          PrintElement(child, currentPage, writer);
+          PrintElement(child, relativeTo, dc);
         }
       }
       catch (Exception ex)
@@ -277,34 +297,33 @@ namespace Zehong.CSharp.Solution.PdfPrinter
     #endregion
 
     #region Shape
-    private static Rect? GetClipRectange(FrameworkElement element, Canvas currentPage)
+    private static Rect? GetClipRectange(FrameworkElement element, FrameworkElement relativeTo)
     {
       var parent = element;
       while (parent != null && !parent.ClipToBounds)
       {
         parent = parent.Parent as FrameworkElement;
       }
-      if (parent != null && !object.ReferenceEquals(parent, currentPage) && parent.ClipToBounds)
+      if (parent != null && !object.ReferenceEquals(parent, relativeTo) && parent.ClipToBounds)
       {
         float left, top;
-        if (GetElementLocation(parent, currentPage, out left, out top))
+        if (GetElementLocation(parent, relativeTo, out left, out top))
           return new Rect(left, top, parent.ActualWidth, parent.ActualHeight);
       }
       return null;
     }
-    private static Boolean PrintShape(Shape shape, Canvas currentPage, PdfWriter writer)
+    private static Boolean PrintShape(Shape shape, FrameworkElement relativeTo, PdfContentByte dc)
     {
       var noBorder = Helper.IsNullOrZero(shape.StrokeThickness) || Helper.IsTransparent(shape.Stroke);
       var noBackground = Helper.IsTransparent(shape.Fill);
       if (noBorder && noBackground)
         return true;
 
-      var dc = writer.DirectContent;
       dc.SaveState();
 
       try
       {
-        var clipRect = GetClipRectange(shape, currentPage);
+        var clipRect = GetClipRectange(shape, relativeTo);
         if (clipRect != null)
         {
           dc.Rectangle(clipRect.Value.Left, clipRect.Value.Top - clipRect.Value.Height, clipRect.Value.Width, clipRect.Value.Height);
@@ -319,9 +338,17 @@ namespace Zehong.CSharp.Solution.PdfPrinter
           dc.SetLineDash(shape.StrokeDashArray.Select(p => p * shape.StrokeThickness).ToArray(), 0);
 
         float left, top;
-        if (!GetElementLocation(shape, currentPage, out left, out top))
+        if (!GetElementLocation(shape, relativeTo, out left, out top))
           return false;
 
+        var lineGeometry = shape.RenderedGeometry as LineGeometry;
+        if (lineGeometry != null)
+        {
+          var startPoint = shape.RenderedGeometry.Transform.Transform(lineGeometry.StartPoint);
+          var endPoint = shape.RenderedGeometry.Transform.Transform(lineGeometry.EndPoint);
+          dc.MoveTo(left + startPoint.X, top - startPoint.Y);
+          dc.LineTo(left + endPoint.X, top - endPoint.Y);
+        }
         var rectangleGeometry = shape.RenderedGeometry as RectangleGeometry;
         if (rectangleGeometry != null)
         {
@@ -593,19 +620,10 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       try
       {
         var font = GetPdfFont(text, fontSize, fontFamily, fontWeight, foreground);
-        if (!String.IsNullOrWhiteSpace(text))
-        {
-          while (font.BaseFont.GetWidthPoint(text, (float)fontSize) >= maxTextWidth)
-          {
-            fontSize -= 0.1;
-          }
-          font.Size = (float)fontSize;
-        }
-
-        var lines = Helper.GetSplitStrings(text, false, '\n');
         var chunk = new Chunk(text, font);
+        var lines = Helper.GetSplitStrings(text, false, '\n');
         if (!Double.IsNaN(lineHeight) || lines.Count > 1)
-          chunk.setLineHeight((float)(renderHeight / lines.Count));
+          chunk.setLineHeight((float)((renderHeight - 1) / lines.Count));
         return new Paragraph(chunk);
       }
       catch (Exception ex)
@@ -615,12 +633,12 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       }
     }
 
-    private static void PrintText(TextBlock textBlock, Canvas currentPage, PdfWriter writer)
+    private static void PrintText(TextBlock textBlock, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
         float left, top;
-        if (!GetElementLocation(textBlock, currentPage, out left, out top))
+        if (!GetElementLocation(textBlock, relativeTo, out left, out top))
           return;
 
         IElement pdfPhrase = GetPdfPhrase(
@@ -633,19 +651,19 @@ namespace Zehong.CSharp.Solution.PdfPrinter
           textBlock.ActualHeight,
           textBlock.LineHeight);
         if (pdfPhrase != null)
-          WritePdfElement(writer.DirectContent, ref pdfPhrase, textBlock, left, top);
+          WritePdfElement(dc, ref pdfPhrase, textBlock, left, top);
       }
       catch (Exception ex)
       {
         ExceptionHandler.ThrowException(ex);
       }
     }
-    private static void PrintText(TextBox textBox, Canvas currentPage, PdfWriter writer)
+    private static void PrintText(TextBox textBox, FrameworkElement relativeTo, PdfContentByte dc)
     {
       try
       {
         float left, top;
-        if (!GetElementLocation(textBox, currentPage, out left, out top))
+        if (!GetElementLocation(textBox, relativeTo, out left, out top))
           return;
 
         IElement pdfPhrase = GetPdfPhrase(
@@ -657,7 +675,7 @@ namespace Zehong.CSharp.Solution.PdfPrinter
           textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right - 4,
           textBox.ActualHeight);
         if (pdfPhrase != null)
-          WritePdfElement(writer.DirectContent, ref pdfPhrase, textBox, left, top);
+          WritePdfElement(dc, ref pdfPhrase, textBox, left, top);
       }
       catch (Exception ex)
       {
@@ -665,9 +683,30 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       }
     }
 
-    private static System.Windows.Controls.Image GetViewport3DImage(Viewport3D viewport3D)
+    private static System.Windows.Controls.Image GetFrameworkElementImage(FrameworkElement frameworkElement)
     {
-      return new System.Windows.Controls.Image() { Source = viewport3D.SafeGetBitmapSource() };
+      if (!frameworkElement.CheckAccess())
+      {
+        System.Windows.Controls.Image ret = null;
+        frameworkElement.Dispatcher.Invoke(new Action(delegate { ret = GetFrameworkElementImage(frameworkElement); }));
+        return ret;
+      }
+
+      RenderTargetBitmap targetBitmap = null;
+      try
+      {
+        if (frameworkElement != null)
+        {
+          targetBitmap = new RenderTargetBitmap((int)frameworkElement.ActualWidth, (int)frameworkElement.ActualHeight, 96d, 96d, PixelFormats.Default);
+          targetBitmap.Render(frameworkElement);
+        }
+      }
+      catch (Exception ex)
+      {
+        ExceptionHandler.ThrowException(ex);
+      }
+      return new System.Windows.Controls.Image() { Source = targetBitmap };
+
     }
     private static void AddElementToCell(PdfPCell pdfCell, ref IElement pdfElement)
     {
@@ -844,18 +883,6 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       }
       return new Font(baseFont, fontSize, isBold ? 1 : 0, PdfPrinter.GetBaseColor(color));
     }
-    private static Double MeasureTextWidth(String text, Double fontSize, String fontFamily, FontWeight fontWeight)
-    {
-      var formattedText = new FormattedText(
-        text,
-        System.Globalization.CultureInfo.InvariantCulture,
-        FlowDirection.LeftToRight,
-        new Typeface(fontFamily.ToString()),
-        fontSize,
-        Brushes.Black);
-      formattedText.SetFontWeight(fontWeight);
-      return formattedText.WidthIncludingTrailingWhitespace;
-    }
 
     private static Boolean CharExists(String text, BaseFont baseFont)
     {
@@ -886,9 +913,9 @@ namespace Zehong.CSharp.Solution.PdfPrinter
       }
     }
 
-    private static void PrintBackground(FrameworkElement uiContainer, Canvas currentPage, PdfWriter writer)
+    private static void PrintBackground(FrameworkElement uiContainer, FrameworkElement relativeTo, PdfContentByte dc)
     {
-      if (uiContainer == null || writer == null)
+      if (uiContainer == null || dc == null)
         return;
 
       PdfPTable pdfTable = null;
@@ -906,8 +933,8 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         pdfCell = null;
 
         float left, top;
-        if (GetElementLocation(uiContainer, currentPage, out left, out top))
-          pdfTable.WriteSelectedRows(0, -1, left, top, writer.DirectContent);
+        if (GetElementLocation(uiContainer, relativeTo, out left, out top))
+          pdfTable.WriteSelectedRows(0, -1, left, top, dc);
       }
       catch (Exception ex)
       {
@@ -919,18 +946,18 @@ namespace Zehong.CSharp.Solution.PdfPrinter
         pdfTable = null;
       }
     }
-    private static Boolean GetElementLocation(UIElement uiElement, Canvas currentPage, out float left, out float top)
+    private static Boolean GetElementLocation(UIElement uiElement, FrameworkElement relativeTo, out float left, out float top)
     {
       left = 0;
       top = 0;
-      if (uiElement == null || currentPage == null)
+      if (uiElement == null || relativeTo == null)
         return false;
 
       try
       {
-        var location = uiElement.TranslatePoint(OrginalPoint, currentPage);
+        var location = uiElement.TranslatePoint(OrginalPoint, relativeTo);
         left = (float)location.X;
-        top = (float)(currentPage.ActualHeight - location.Y);
+        top = (float)(relativeTo.ActualHeight - location.Y);
         return true;
       }
       catch (Exception ex)
@@ -962,8 +989,8 @@ namespace Zehong.CSharp.Solution.PdfPrinter
 
     #endregion
 
-    private static iTextSharp.text.Color TransparentBaseColor = new iTextSharp.text.Color(0, 0, 0, 0);
-    private static Point OrginalPoint = new Point(0, 0);
+    private static readonly iTextSharp.text.Color TransparentBaseColor = new iTextSharp.text.Color(0, 0, 0, 0);
+    private static readonly Point OrginalPoint = new Point(0, 0);
   }
   public class GradientBackgroundEvent : IPdfPCellEvent
   {

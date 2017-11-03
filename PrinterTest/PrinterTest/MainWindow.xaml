@@ -4,16 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrinterTest"
-        mc:Ignorable="d" SizeToContent="WidthAndHeight"
+        SizeToContent="WidthAndHeight"
         Title="MainWindow">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
+
     <Canvas Grid.Row="0" Width="350" Height="350" Name="canvasObj" Background="Pink" ClipToBounds="True">
       <TextBlock Text="▲" FontSize="12" Canvas.Left="100" Canvas.Top="100"/>
-      <UniformGrid Columns="3">
+      <UniformGrid Columns="3" Background="LightGreen" Visibility="Collapsed">
         <TextBlock Text="TextBlock 01" Margin="4"/>
         <TextBlock Text="TextBlock 02" Margin="4"/>
         <TextBlock Text="TextBlock 03" Margin="4"/>
@@ -31,12 +32,54 @@
         <TextBlock Text="TextBlock 15" Margin="4"/>
         <TextBlock Text="TextBlock 16" Margin="4"/>
         <TextBlock Text="TextBlock 17" Margin="4"/>
-        <TextBlock Text="TextBlock 18" Margin="4"/>
+        <TextBlock Text="TextBlock 18" Margin="4" Background="Blue"/>
         <TextBlock Text="TextBlock 19" Margin="4"/>
         <TextBlock Text="TextBlock 20" Margin="4"/>
         <TextBlock Text="TextBlock 21" Margin="4"/>
       </UniformGrid>
+      <Border Canvas.Left="100" Canvas.Top="100" Width="150" Height="200" Background="Green">
+        <Viewbox Stretch="Uniform" Name="ViewboxObj">
+          <StackPanel Background="Yellow">
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content." Background="Blue"/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content."/>
+            <TextBlock Text="This is a test content.(END)"/>
+          </StackPanel>
+        </Viewbox>
+      </Border>
     </Canvas>
-    <Button Grid.Row="1" Content="Print" Click="btnPrint_Click"/>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Margin="4" Content="Print" Click="btnPrint_Click"/>
+    </StackPanel>
   </Grid>
 </Window>

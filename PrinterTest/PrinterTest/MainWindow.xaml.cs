@@ -33,6 +33,10 @@ namespace PrinterTest
         DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss"));
 
       PdfPrinter.Print(new List<Canvas> { canvasObj }, path);
+
+      //PrintDialog pd = new PrintDialog();
+      //if (pd.ShowDialog() ?? false)
+      //  pd.PrintVisual(ViewboxObj, "Printing a UserControl");
     }
   }
 }
